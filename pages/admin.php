@@ -22,7 +22,7 @@ session_start();
     <title>Admin</title>
 </head>
 <body>
-<?php
+    <?php
     if (empty($_SESSION['username'])) {
         echo "<script>window.location.href = '../login.html'</script>";
     }
@@ -39,7 +39,6 @@ session_start();
         }
     }
     ?>
-
     <section>
         <nav class="navbar bg-light fixed-top">
             <div class="container-fluid">
@@ -55,19 +54,19 @@ session_start();
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                             <li class="nav-item">
-                                <button class="btn" onclick="window.location.href = '../index.php'">Home</button>
+                                <button class="btn" onclick="window.location.href = '../index.php'"><i class="bi bi-house-door-fill me-2 text-dark"></i>Home</button>
                             </li>
                             <?php
                             if ($_SESSION['usertype'] == "Admin") {
-                                echo '<li class="nav-item"><button class="btn" aria-current="page" onclick="location.reload();">Admin</button></li>';
+                                echo '<li class="nav-item"><button class="btn" aria-current="page" onclick="location.reload();"><i class="bi bi-person-circle me-2 text-primary"></i>Admin</button></li>';
                             } 
                             ?>
                             <li class="nav-item">
-                                <button class="btn" onclick="window.location.href = 'setting.php'">Setting</button>
+                                <button class="btn" onclick="window.location.href = 'setting.php'"><i class="bi bi-gear-fill me-2 text-success"></i>Setting</button>
                             </li>
                             <hr>
                             <li class="nav-item">
-                                <button class="btn" onclick="logout()">Logout</button>
+                                <button class="btn" onclick="logout()"><i class="bi bi-box-arrow-right me-2 text-danger"></i>Logout</button>
                             </li>
                         </ul>
                     </div>
@@ -90,7 +89,7 @@ session_start();
                         <th>#</th>
                         <th>Name</th>
                         <th>Nickname</th>
-                        <th>Team</th>
+                        <th>Team<i class="bi bi-gear ms-2" onclick="settingTeam()" style="cursor: pointer;"></i></th>
                         <th>Type</th>
                         <th><i class="bi bi-info-circle text-info"></i></th>
                         <th><i class="bi bi-pencil-square text-success"></i></th>
@@ -104,7 +103,7 @@ session_start();
         </div>
     </section>
 
-    <div class="modal" tabindex="-1" id="add-new-user-modal">
+    <div class="modal fade" tabindex="-1" id="add-new-user-modal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -150,7 +149,7 @@ session_start();
         </div>
     </div>
 
-    <div class="modal" tabindex="-1" id="view-user-modal">
+    <div class="modal fade" tabindex="-1" id="view-user-modal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -187,7 +186,7 @@ session_start();
         </div>
     </div>
 
-    <div class="modal" tabindex="-1" id="edit-user-modal">
+    <div class="modal fade" tabindex="-1" id="edit-user-modal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -232,7 +231,7 @@ session_start();
         </div>
     </div>
 
-    <div class="modal" tabindex="-1" id="delete-user-modal">
+    <div class="modal fade" tabindex="-1" id="delete-user-modal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -257,6 +256,38 @@ session_start();
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" onclick="deleteUser(null)">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" id="setting-team-modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Setting Team</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-1">
+                        <input type="text" class="form-control" placeholder="Add New Team" id="add-new-team">
+                        <button class="btn btn-outline-primary" onclick="addNewTeam()"><i class="bi bi-plus-circle"></i></button>
+                    </div>
+                    <hr>
+                    <div class="alert alert-danger mb-1 visually-hidden" role="alert" id="alert-team"></div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="text-center">
+                                <th align="center">#</th>
+                                <th align="center">Team</th>
+                                <th align="center">Edit</th>
+                                <th align="center">Delete</th>
+                            </thead>
+                            <tbody id="list_team">
+                                
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -317,20 +348,25 @@ session_start();
                 var team = document.getElementById("add-team").value;
                 var type = document.getElementById("add-type").value;
 
-                var insert = requestHTTPS('../api/backend.php', {
-                    'api': 'insert-user',
-                    'username': username,
-                    'fullname': fullname,
-                    'nickname': nickname,
-                    'password': password,
-                    'team': team,
-                    'type': type,
-                }, true);
-                if (insert.result == true) {
-                    location.reload();
+                if (username == "" || fullname == "" || nickname == "" || password == "" || team == "" || type == "") {
+
                 }
                 else {
-
+                    var insert = requestHTTPS('../api/backend.php', {
+                        'api': 'insert-user',
+                        'username': username,
+                        'fullname': fullname,
+                        'nickname': nickname,
+                        'password': password,
+                        'team': team,
+                        'type': type,
+                    }, true);
+                    if (insert.result == true) {
+                        location.reload();
+                    }
+                    else {
+    
+                    }
                 }
             }
         }
@@ -427,6 +463,102 @@ session_start();
                 else {
 
                 }
+            }
+        }
+
+        function settingTeam() {
+            var list_team = requestHTTPS('../api/backend.php', {
+                'api': 'load-team'
+            }, true);
+
+            var teams = "";
+            for (var i = 0; i < list_team.list_team.length; i++) {
+                var item = list_team.list_team[i];
+                teams += '<tr>';
+                    teams += '<td align="center">'+(i+1)+'</td>';
+                    teams += '<td align="center"><input type="text" class="form-control" value="'+item.team+'" id="edit-'+item.id+'"></td>';
+                    teams += '<td align="center">';
+                        teams += '<btton class="btn btn-outline-success" id="EDIT-'+item.id+'" onclick="editTeam(this)">';
+                            teams += '<i class="bi bi-pencil-square"></i>';
+                        teams += '</btton>';
+                    teams += '</td>';
+                    teams += '<td align="center">';
+                        teams += '<btton class="btn btn-outline-danger" id="DELETE-'+item.id+'" onclick="deleteTeam(this)">';
+                            teams += '<i class="bi bi-trash3-fill"></i>';
+                        teams += '</btton>';
+                    teams += '</td>';
+                teams += '</tr>';
+            }
+            document.getElementById("list_team").innerHTML = teams;
+            $("#setting-team-modal").modal('show');
+        }
+
+        function addNewTeam() {
+            var newTeam = document.getElementById("add-new-team").value;
+            if (newTeam == "") {
+                document.getElementById("alert-team").innerText = "Please Enter Team Name";
+                document.getElementById("alert-team").classList.remove("visually-hidden");
+                document.getElementById("alert-team").classList.add("visually-visible");
+                return;
+            }
+            else {
+                var insert = requestHTTPS('../api/backend.php', {
+                    'api': 'insert-team',
+                    'team': newTeam
+                }, true);
+                if (insert.result == true) {
+                    location.reload();
+                }
+                else if (insert.result == false) {
+                    document.getElementById("alert-team").innerText = insert.message;
+                    document.getElementById("alert-team").classList.remove("visually-hidden");
+                    document.getElementById("alert-team").classList.add("visually-visible");
+                    return;
+                }
+            }
+        }
+
+        function editTeam(btn) {
+            var teamID = btn.id.replace("EDIT-", "");
+            var newTeam = document.getElementById("edit-"+teamID).value;
+            if (newTeam == "") {
+                document.getElementById("alert-team").innerText = "Please Enter Team Name";
+                document.getElementById("alert-team").classList.remove("visually-hidden");
+                document.getElementById("alert-team").classList.add("visually-visible");
+                return;
+            }
+            else {
+                var update = requestHTTPS('../api/backend.php', {
+                    'api': 'update-team',
+                    'teamID': teamID,
+                    'team': newTeam
+                }, true);
+                if (update.result == true) {
+                    location.reload();
+                }
+                else if (update.result == false) {
+                    document.getElementById("alert-team").innerText = update.message;
+                    document.getElementById("alert-team").classList.remove("visually-hidden");
+                    document.getElementById("alert-team").classList.add("visually-visible");
+                    return;
+                }
+            }
+        }
+
+        function deleteTeam(btn) {
+            var teamID = btn.id.replace("DELETE-", "");
+            var del = requestHTTPS('../api/backend.php', {
+                'api': 'delete-team',
+                'teamID': teamID,
+            }, true);
+            if (del.result == true) {
+                location.reload();
+            }
+            else if (del.result == false) {
+                document.getElementById("alert-team").innerText = del.message;
+                document.getElementById("alert-team").classList.remove("visually-hidden");
+                document.getElementById("alert-team").classList.add("visually-visible");
+                return;
             }
         }
 
