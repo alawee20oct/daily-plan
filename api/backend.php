@@ -180,6 +180,40 @@ else if ($input['api'] == 'save-plan') {
     }
 }
 
+else if ($input['api'] == 'save-holiday') {
+    $holiday = $input['holiday'];
+    $div_date = explode("-", $holiday);
+    $d = intval($div_date[2]);
+    $m = intval($div_date[1]);
+    $y = intval($div_date[0]);
+    $ok = 0;
+
+    $sql_users = mysqli_query($connect, "SELECT * FROM tb_user WHERE 1");
+    while ($row = mysqli_fetch_array($sql_users)) {
+        $id = $row['id'];
+        $sql_planned = mysqli_query($connect, "SELECT * FROM tb_plan WHERE id_user = '$id' AND datesave = '$holiday'");
+        if (mysqli_num_rows($sql_planned) > 0) {
+            $update = mysqli_query($connect, "UPDATE tb_plan SET options = 'H' WHERE id_user = '$id' AND datesave = '$holiday'");
+            if ($update) {
+                $ok++;
+            }
+        }
+        else {
+            $insert = mysqli_query($connect,
+                "INSERT INTO tb_plan (id_user, datesave, options, date, month, year) 
+                VALUES ('$id', '$holiday', 'H', '$d', '$m', '$y')"
+            );
+            if ($insert) {
+                $ok++;
+            }
+        }
+    }
+
+    if (mysqli_num_rows($sql_users) == $ok) {
+        $output = array('result'=>true);
+    }
+}
+
 else if ($input['api'] == 'insert-user') {
     $username = $input['username'];
     $fullname = $input['fullname'];
@@ -243,37 +277,49 @@ else if ($input['api'] == 'delete-user') {
     }
 }
 
-else if ($input['api'] == 'save-holiday') {
-    $holiday = $input['holiday'];
-    $div_date = explode("-", $holiday);
-    $d = intval($div_date[2]);
-    $m = intval($div_date[1]);
-    $y = intval($div_date[0]);
-    $ok = 0;
-
-    $sql_users = mysqli_query($connect, "SELECT * FROM tb_user WHERE 1");
-    while ($row = mysqli_fetch_array($sql_users)) {
-        $id = $row['id'];
-        $sql_planned = mysqli_query($connect, "SELECT * FROM tb_plan WHERE id_user = '$id' AND datesave = '$holiday'");
-        if (mysqli_num_rows($sql_planned) > 0) {
-            $update = mysqli_query($connect, "UPDATE tb_plan SET options = 'H' WHERE id_user = '$id' AND datesave = '$holiday'");
-            if ($update) {
-                $ok++;
-            }
+else if ($input['api'] == 'insert-team') {
+    $team = $input['team'];
+    $sql = mysqli_query($connect, "SELECT * FROM tb_team WHERE team = '$team'");
+    if (mysqli_num_rows($sql) > 0) {
+        $output = array('result'=>false, 'message'=>"This Team Already Exist!");
+    }
+    else {
+        $insert = mysqli_query($connect, "INSERT INTO tb_team (team) VALUES ('$team')");
+        if ($insert) {
+            $output = array('result'=>true, 'message'=>"");
         }
         else {
-            $insert = mysqli_query($connect,
-                "INSERT INTO tb_plan (id_user, datesave, options, date, month, year) 
-                VALUES ('$id', '$holiday', 'H', '$d', '$m', '$y')"
-            );
-            if ($insert) {
-                $ok++;
-            }
+            $output = array('result'=>false, 'message'=>mysqli_error($connect));
         }
     }
+}
 
-    if (mysqli_num_rows($sql_users) == $ok) {
-        $output = array('result'=>true);
+else if ($input['api'] == 'update-team') {
+    $teamID = $input['teamID'];
+    $team = $input['team'];
+    $sql = mysqli_query($connect, "SELECT * FROM tb_team WHERE team = '$team'");
+    if (mysqli_num_rows($sql) > 0) {
+        $output = array('result'=>false, 'message'=>"This Team Already Exist!");
+    }
+    else {
+        $update = mysqli_query($connect, "UPDATE tb_team SET team = '$team' WHERE id = '$teamID'");
+        if ($update) {
+            $output = array('result'=>true, 'message'=>"");
+        }
+        else {
+            $output = array('result'=>false, 'message'=>mysqli_error($connect));
+        }
+    }
+}
+
+else if ($input['api'] == 'delete-team') {
+    $teamID = $input['teamID'];
+    $delete = mysqli_query($connect, "DELETE FROM tb_team WHERE id = '$teamID'");
+    if ($delete) {
+        $output = array('result'=>true, 'message'=>"");
+    }
+    else {
+        $output = array('result'=>false, 'message'=>mysqli_error($connect));
     }
 }
 
